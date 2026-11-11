@@ -29,14 +29,21 @@ class Bird:
 
     def update(self):
         frame_time = game_framework.frame_time
-        self.x += self.direction * BIRD_SPEED_PPS * frame_time
         left_edge = BIRD_FRAME_WIDTH / 2
         right_edge = get_canvas_width() - left_edge
-        if self.x <= left_edge:
-            self.x = left_edge
+        travel_distance = BIRD_SPEED_PPS * frame_time
+        flight_span = right_edge - left_edge
+        phase = (
+            self.x - left_edge
+            if self.direction > 0
+            else 2 * flight_span - (self.x - left_edge)
+        )
+        phase = (phase + travel_distance) % (2 * flight_span)
+        if phase < flight_span:
+            self.x = left_edge + phase
             self.direction = 1
-        elif self.x >= right_edge:
-            self.x = right_edge
+        else:
+            self.x = right_edge - (phase - flight_span)
             self.direction = -1
 
         self.frame = (

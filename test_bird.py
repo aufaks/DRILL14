@@ -18,12 +18,19 @@ pico2d_stub.get_canvas_width = lambda: 1600
 pico2d_stub.load_image = lambda _: image
 framework_stub = types.ModuleType('game_framework')
 framework_stub.frame_time = 0.0
+boy_stub = types.ModuleType('boy')
+boy_stub.Boy = object
+grass_stub = types.ModuleType('grass')
+grass_stub.Grass = object
 
 with patch.dict(sys.modules, {
         'pico2d': pico2d_stub,
         'game_framework': framework_stub,
+        'boy': boy_stub,
+        'grass': grass_stub,
 }):
     import bird
+    import play_mode
 
 
 class BirdTests(unittest.TestCase):
@@ -62,7 +69,11 @@ class BirdTests(unittest.TestCase):
         bird.game_framework.frame_time = 0.1
         flying_bird.update()
 
-        self.assertEqual(flying_bird.x, 1600 - bird.BIRD_FRAME_WIDTH / 2)
+        self.assertAlmostEqual(
+            flying_bird.x,
+            1600 - bird.BIRD_FRAME_WIDTH / 2
+            - bird.BIRD_SPEED_PPS * 0.1,
+        )
         self.assertEqual(flying_bird.direction, -1)
 
     def test_large_frame_time_preserves_distance_after_edge_turn(self):
@@ -87,6 +98,16 @@ class BirdTests(unittest.TestCase):
         flying_bird.update()
 
         self.assertAlmostEqual(flying_bird.frame, 0.5)
+
+    def test_play_mode_creates_ten_birds_in_two_lanes(self):
+        flock = play_mode.create_bird_flock()
+
+        self.assertEqual(len(flock), 10)
+        self.assertEqual({flying_bird.y for flying_bird in flock}, {250, 440})
+        self.assertEqual(
+            [flying_bird.direction for flying_bird in flock],
+            [1 if index % 2 == 0 else -1 for index in range(10)],
+        )
 
 
 if __name__ == '__main__':
