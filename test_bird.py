@@ -65,6 +65,21 @@ class BirdTests(unittest.TestCase):
         self.assertEqual(flying_bird.x, 1600 - bird.BIRD_FRAME_WIDTH / 2)
         self.assertEqual(flying_bird.direction, -1)
 
+    def test_large_frame_time_preserves_distance_after_edge_turn(self):
+        right_edge = 1600 - bird.BIRD_FRAME_WIDTH / 2
+        flying_bird = bird.Bird(right_edge - 20, 250, 1)
+        elapsed_time = 2.0
+        bird.game_framework.frame_time = elapsed_time
+        flying_bird.update()
+
+        distance_after_turn = (
+            bird.BIRD_SPEED_PPS * elapsed_time - 20
+        )
+        self.assertAlmostEqual(
+            flying_bird.x, right_edge - distance_after_turn
+        )
+        self.assertEqual(flying_bird.direction, -1)
+
     def test_animation_repeats_after_all_frames(self):
         flying_bird = bird.Bird(400, 250)
         flying_bird.frame = bird.BIRD_FRAME_COUNT - 0.5
