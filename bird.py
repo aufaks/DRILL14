@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import get_canvas_width, load_image
 
 import game_framework
 
@@ -29,6 +29,15 @@ class Bird:
     def update(self):
         frame_time = game_framework.frame_time
         self.x += self.direction * BIRD_SPEED_PPS * frame_time
+        left_edge = BIRD_FRAME_WIDTH / 2
+        right_edge = get_canvas_width() - left_edge
+        if self.x <= left_edge:
+            self.x = left_edge
+            self.direction = 1
+        elif self.x >= right_edge:
+            self.x = right_edge
+            self.direction = -1
+
         self.frame = (
             self.frame + BIRD_FRAMES_PER_SECOND * frame_time
         ) % BIRD_FRAME_COUNT
