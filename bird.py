@@ -28,6 +28,7 @@ class Bird:
         self.frame = 0.0
 
     def update(self):
+        """Advance flight and animation using elapsed time and reflected bounds."""
         frame_time = game_framework.frame_time
         left_edge = BIRD_FRAME_WIDTH / 2
         right_edge = get_canvas_width() - left_edge
