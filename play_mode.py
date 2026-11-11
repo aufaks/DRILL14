@@ -2,7 +2,7 @@ from pico2d import *
 import game_world
 import game_framework
 from boy import Boy
-from bird import BIRD_COUNT, BIRD_FRAME_WIDTH, Bird
+from bird import BIRD_COUNT, BIRD_DISPLAY_WIDTH, Bird
 from grass import Grass
 
 boy = None
@@ -10,7 +10,7 @@ birds = []
 
 
 def create_bird_flock():
-    left_edge = BIRD_FRAME_WIDTH / 2
+    left_edge = BIRD_DISPLAY_WIDTH / 2
     right_edge = get_canvas_width() - left_edge
     flight_lanes = (250, 440)
 
@@ -74,7 +74,6 @@ def render():
     clear_canvas()
     game_world.render()
     update_canvas()
-
 
 
 

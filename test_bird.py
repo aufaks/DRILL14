@@ -8,7 +8,7 @@ class FakeImage:
     def __init__(self):
         self.draw_calls = []
 
-    def clip_draw(self, *args):
+    def clip_composite_draw(self, *args):
         self.draw_calls.append(args)
 
 
@@ -61,23 +61,25 @@ class BirdTests(unittest.TestCase):
         self.assertEqual(
             image.draw_calls[-1],
             (bird.BIRD_FRAME_WIDTH, 170,
-             bird.BIRD_FRAME_WIDTH, bird.BIRD_FRAME_HEIGHT, 320, 250),
+             bird.BIRD_FRAME_WIDTH, bird.BIRD_FRAME_HEIGHT,
+             0, '', 320, 250,
+             bird.BIRD_DISPLAY_WIDTH, bird.BIRD_DISPLAY_HEIGHT),
         )
 
     def test_bird_turns_before_leaving_the_canvas(self):
-        flying_bird = bird.Bird(1600 - bird.BIRD_FRAME_WIDTH / 2, 250, 1)
+        flying_bird = bird.Bird(1600 - bird.BIRD_DISPLAY_WIDTH / 2, 250, 1)
         bird.game_framework.frame_time = 0.1
         flying_bird.update()
 
         self.assertAlmostEqual(
             flying_bird.x,
-            1600 - bird.BIRD_FRAME_WIDTH / 2
+            1600 - bird.BIRD_DISPLAY_WIDTH / 2
             - bird.BIRD_SPEED_PPS * 0.1,
         )
         self.assertEqual(flying_bird.direction, -1)
 
     def test_large_frame_time_preserves_distance_after_edge_turn(self):
-        right_edge = 1600 - bird.BIRD_FRAME_WIDTH / 2
+        right_edge = 1600 - bird.BIRD_DISPLAY_WIDTH / 2
         flying_bird = bird.Bird(right_edge - 20, 250, 1)
         elapsed_time = 2.0
         bird.game_framework.frame_time = elapsed_time
@@ -90,6 +92,12 @@ class BirdTests(unittest.TestCase):
             flying_bird.x, right_edge - distance_after_turn
         )
         self.assertEqual(flying_bird.direction, -1)
+
+    def test_draw_flips_bird_when_flying_left(self):
+        flying_bird = bird.Bird(320, 250, -1)
+        flying_bird.draw()
+
+        self.assertEqual(image.draw_calls[-1][5], 'h')
 
     def test_animation_repeats_after_all_frames(self):
         flying_bird = bird.Bird(400, 250)

@@ -5,6 +5,8 @@ import game_framework
 
 BIRD_FRAME_WIDTH = 183
 BIRD_FRAME_HEIGHT = 168
+BIRD_DISPLAY_WIDTH = 100
+BIRD_DISPLAY_HEIGHT = 92
 BIRD_SHEET_COLUMNS = 5
 BIRD_FRAME_COUNT = 14
 BIRD_SHEET_HEIGHT = 506
@@ -30,8 +32,9 @@ class Bird:
     def update(self):
         """Advance flight and animation using elapsed time and reflected bounds."""
         frame_time = game_framework.frame_time
-        left_edge = BIRD_FRAME_WIDTH / 2
-        right_edge = get_canvas_width() - left_edge
+        half_width = BIRD_DISPLAY_WIDTH / 2
+        left_edge = half_width
+        right_edge = get_canvas_width() - half_width
         travel_distance = BIRD_SPEED_PPS * frame_time
         flight_span = right_edge - left_edge
         phase = (
@@ -56,8 +59,10 @@ class Bird:
         column = frame_index % BIRD_SHEET_COLUMNS
         row = frame_index // BIRD_SHEET_COLUMNS
         source_y = BIRD_SHEET_HEIGHT - (row + 1) * BIRD_FRAME_HEIGHT
-        self.image.clip_draw(
+        flip = '' if self.direction > 0 else 'h'
+        self.image.clip_composite_draw(
             column * BIRD_FRAME_WIDTH, source_y,
             BIRD_FRAME_WIDTH, BIRD_FRAME_HEIGHT,
-            self.x, self.y
+            0, flip, self.x, self.y,
+            BIRD_DISPLAY_WIDTH, BIRD_DISPLAY_HEIGHT,
         )
